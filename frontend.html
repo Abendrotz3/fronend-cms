@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Headless</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .post { border-bottom: 1px solid #ccc; margin-bottom: 20px; padding-bottom: 10px; }
+        h2 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Últimas Entradas</h1>
+    <div id="posts-container">Cargando posts...</div>
+
+    <script>
+        const API_URL = 'http://cmd-headless.local/wp-json/wp/v2/posts';
+
+        async function fetchPosts() {
+            try {
+                const response = await fetch(API_URL);
+                const posts = await response.json();
+                const container = document.getElementById('posts-container');
+                container.innerHTML = '';
+
+                posts.forEach(post => {
+                    const postElement = document.createElement('article');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <h2>${post.title.rendered}</h2>
+                        <div>${post.excerpt.rendered}</div>
+                        <a href="${post.link}" target="_blank">Leer más</a>
+                    `;
+                    container.appendChild(postElement);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('posts-container').innerText = 'Error al cargar los posts.';
+            }
+        }
+
+        fetchPosts();
+    </script>
+</body>
+</html>
